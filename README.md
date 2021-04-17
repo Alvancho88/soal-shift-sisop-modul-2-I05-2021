@@ -145,7 +145,7 @@ If i run the program, the program only the delete the zip file and the apex_chea
 
 <img width="1301" alt="Screen Shot 2021-04-17 at 20 11 07" src="https://user-images.githubusercontent.com/74056954/115114371-24cb4700-9fb9-11eb-9b1a-cd616dcd2db5.png">
 
-# Question 2
+# Question 3
 
 Ranora is an Informatics Engineering student who is currently undergoing an internship at a well-known company called "FakeKos Corp.", a company engaged in data security. Because Ranora is still an apprentice, the workload is not as big as the workload of the company's permanent workers. On Ranora's first day of work, Ranora's apprentice tutor gave her the task of making a program.
 
