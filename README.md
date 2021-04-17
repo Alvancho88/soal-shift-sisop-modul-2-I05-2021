@@ -8,19 +8,26 @@ Repository for Second Operating System Lab Work
 **Muhammad Rafi Hayla Arifa - 05111942000014**
 
 # Question 1
-Once upon a time, there was a steven who lived a mediocre live. Steven had a girlfriend, but they have broken up before getting together. When he was thinking about his ex, he always watches https://www.youtube.com/watch?v=568DH_9CMKI to relieve his sadness. 
+Once upon a time, there was a steven who lived a mediocre live. Steven had a girlfriend, but they have broken up before getting together. 
+When he was thinking about his ex, he always watches https://www.youtube.com/watch?v=568DH_9CMKI to relieve his sadness. 
 
-In the meantime, Steven hates SISOP Course very much like no other, Few hours after breaking up with his girlfriend, he found another  woman named Stevany, but Stevany is the opposite of him because she likes SISOP course very much. Steven wanted to look good at SISOP course to impress her.
+In the meantime, Steven hates SISOP Course very much like no other, Few hours after breaking up with his girlfriend, he found another  woman named Stevany, 
+but Stevany is the opposite of him because she likes SISOP course very much. Steven wanted to look good at SISOP course to impress her.
 
-On her birthday, he wanted to give her a zip file containing all things that she likes. He wanted the zip to be organized by making a new folder for each file extension. (a) Because she likes the letter Y so much, He wanted the name of the folder as Musyik for mp3, Fylm for mp4, and Pyoto for jpg (b) For music, he downloads it from the link below, so are the cases for films and photos. (c) he didn’t want the folder to contain the zip files so he extracts the files first after downloading it. (d) moving it to the folder that has been made (only the files).
-
+On her birthday, he wanted to give her a zip file containing all things that she likes. He wanted the zip to be organized by making a new folder for each file extension. 
+(a) Because she likes the letter Y so much, He wanted the name of the folder as Musyik for mp3, Fylm for mp4, and Pyoto for jpg 
+(b) For music, he downloads it from the link below, so are the cases for films and photos. 
+(c) he didn’t want the folder to contain the zip files so he extracts the files first after downloading it. 
+(d) moving it to the folder that has been made (only the files).
 (e) When it’s her birthday, all folder will be zipped with the name Lopyu_Stevany.zip and all the folders will be deleted. (Only the zip remains).
 (f) To make his life easier, he wants all of the above to run automatically 6 hours before her birthday (except for point e of course)
+
 Steven is asking your help who is the greatest of the greats of sisop master to help get her heart. Help him!!!
 
 Note:
 Stevany’s birthday : 09 April Pukul 22.22 WIB
 All points are run by 1 script on the background, that includes downloading the zip file. So you just need to run 1 script and change the time and date to check the result.
+
 ```
 Preview :
 https://drive.google.com/drive/folders/1NzRiPPoVlR_H8P51cxN4jaceeFQGk4un
@@ -59,67 +66,15 @@ Wget --no-check-certificate "https://drive.google.com/uc?id=1ZG8nRBRPquhYXq_sISd
 
 **Source Code**
 
+**Can be seen in the above folder (soal1)**
+
+**Explanation**
+-----
+a.) Here we are asked to simply make a folder with names of Musyik, Fylm, and Pyoto
+note: we cannot use mkdir() in c, but there is a way to go around it and that is by using fork() and execv()
+We can use them to call for mkdir much like using system but more safely, since system() is risky.
+
 ```
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <wait.h>
-#include <time.h>
-#include <unistd.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#define Folder_Count 3
-
-void function_delete_folders(pid_t child_id, int * status, char * directory_name[]) {
-
-	if((child_id = fork()) == 0){
-		char *argv[] = {"rm", "-r", directory_name[0], directory_name[1], directory_name[2], NULL};
-        	execv("/bin/rm", argv);
-	}
-	while(wait(status) > 0);
-	//r=remove directories and their contents recursively
-
-}
-
-void function_move_files(struct dirent * directory_entry, int * status, char directory_name[], char stevany_directory_name[]) {
-
-	pid_t child_move = fork();
-	if(child_move == 0 && (strcmp(directory_entry->d_name, ".") == 0 || strcmp(directory_entry->d_name, "..") == 0)){
-		exit(EXIT_SUCCESS);
-	}
-
-	if(child_move == 0) {
-        	char path_file[256];
-
-        	strcpy(path_file, directory_name);
-        	strcat(path_file, "/");
-        	strcat(path_file, directory_entry->d_name);
-
-        	char *argv[] = {"mv", path_file, stevany_directory_name, NULL};
-        	execv("/bin/mv", argv);
-	}
-	while(wait(status) > 0);
-}
-
-void function_search_folder_and_move_files(int * status, char directory_name[], char stevany_directory_name[]) {
-
-	DIR * directory = opendir(directory_name);
-	struct dirent * directory_entry;
-
-	if (directory != NULL) {
-		while ((directory_entry = readdir(directory))){
-			function_move_files(directory_entry, status, directory_name, stevany_directory_name);		
-		}
-		(void) closedir (directory);
-	} 
-	else {
-		perror ("Directory access denied");
-	}
-
-}
-
 void function_make_folders(pid_t child_id, int * status, char *directory_name[], char *stevany_directory_name[]) {
 
 	//Making a new folder for each file extension by calling fork so that child will execute mkdir command
@@ -131,20 +86,13 @@ void function_make_folders(pid_t child_id, int * status, char *directory_name[],
 	//-p=no error if existing, make parent directories as needed
 
 }
+```
 
-void Zip_Birthday_Folders(pid_t child_id, int * status, char *stevany_directory_name[], char zip_name[]) {
-
-	//Zip Folders on Stefany's Birthday
-	if((child_id = fork()) == 0) {
-        	char *argv[] = {"zip", "-rm", zip_name, stevany_directory_name[0], stevany_directory_name[1], stevany_directory_name[2], NULL};
-        	execv("/bin/zip", argv);
-	}
-	while(wait(status) > 0);
-	//m=Move the specified files into the zip archive,r=Travel the directory structure recursively;
-}
-
-void function_download_and_unzip(pid_t child_id, int * status) {
-
+b.) 
+Then we need to use the same method to downloads files in zip from the given links
+We will use fork and execv again this time
+Although this time it's more tricky since I haven't suceed in always be able to download it
+```
 	//Download Zip Files
         if((child_id = fork()) > 0){
 
@@ -173,7 +121,12 @@ void function_download_and_unzip(pid_t child_id, int * status) {
 	}
 	while(wait(status) > 0);
 	//Makes wget to continue despite verification failure, but it still will complain - without that option set wget would simply stop once verification failed.
+```
 
+c.) 
+We need to extract the files from the zip that has been downloaded
+We can use the same method that is fork and exec for this one on the same function after we download the files
+```
 	//Unzip into files
         if((child_id = fork()) > 0){
 		char *argv[] = {"unzip", "Fylm_for_Stevany.zip", NULL};
@@ -188,27 +141,58 @@ void function_download_and_unzip(pid_t child_id, int * status) {
 		execv("/bin/unzip", argv);
 	}
 	while(wait(status) > 0);
+```
 
-}
+d.) 
+Now, we need to move the files to the folder that has been made
+First we need to search the folder
 
-void Main_Function(pid_t child_id, char *stevany_directory_name[]) {
+```
+void function_search_folder_and_move_files(int * status, char directory_name[], char stevany_directory_name[]) {
 
-	int status;
-	
-	char *directory_name[] = {"Film", "Musik", "Foto"};
+	DIR * directory = opendir(directory_name);
+	struct dirent * directory_entry;
 
-	function_make_folders(child_id, &status, directory_name, stevany_directory_name);
-
-	function_download_and_unzip(child_id, &status);
-
-	for(int i=0; i<Folder_Count; i++){
-        	function_search_folder_and_move_files(&status, directory_name[i], stevany_directory_name[i]);
+	if (directory != NULL) {
+		while ((directory_entry = readdir(directory))){
+			function_move_files(directory_entry, status, directory_name, stevany_directory_name);		
+		}
+		(void) closedir (directory);
+	} 
+	else {
+		perror ("Directory access denied");
 	}
 
-	function_delete_folders(child_id, &status, directory_name);
-
 }
+```
 
+Then we move the files using a created function
+```
+void function_move_files(struct dirent * directory_entry, int * status, char directory_name[], char stevany_directory_name[]) {
+
+	pid_t child_move = fork();
+	if(child_move == 0 && (strcmp(directory_entry->d_name, ".") == 0 || strcmp(directory_entry->d_name, "..") == 0)){
+		exit(EXIT_SUCCESS);
+	}
+
+	if(child_move == 0) {
+        	char path_file[256];
+
+        	strcpy(path_file, directory_name);
+        	strcat(path_file, "/");
+        	strcat(path_file, directory_entry->d_name);
+
+        	char *argv[] = {"mv", path_file, stevany_directory_name, NULL};
+        	execv("/bin/mv", argv);
+	}
+	while(wait(status) > 0);
+}
+```
+
+e.) 
+We are asked to zipped all the folders with the name Lopyu_Stevanny.zip and then delete the folders on her birthday
+We will create a function to check if it's Stevanny birthday date or not
+```
 int Birthday_Date_Check(int day, int month) {
 
 	//Check date to be more efficient
@@ -217,7 +201,10 @@ int Birthday_Date_Check(int day, int month) {
 
 	return birthday_day == day && birthday_month == month;
 }
+```
 
+Then, we will continue to create the Daemon to run the program automatically
+```
 void Daemon_Function_Call(int * status) {
 
 	pid_t child_id;
@@ -245,7 +232,52 @@ void Daemon_Function_Call(int * status) {
         sleep(sleep_time);
 	}
 }
+```
 
+Where if it is the date of her birthday and on the right time, it will execute the function to zip all the folders into one
+```
+void Zip_Birthday_Folders(pid_t child_id, int * status, char *stevany_directory_name[], char zip_name[]) {
+
+	//Zip Folders on Stefany's Birthday
+	if((child_id = fork()) == 0) {
+        	char *argv[] = {"zip", "-rm", zip_name, stevany_directory_name[0], stevany_directory_name[1], stevany_directory_name[2], NULL};
+        	execv("/bin/zip", argv);
+	}
+	while(wait(status) > 0);
+	//m=Move the specified files into the zip archive,r=Travel the directory structure recursively;
+}
+```
+
+f.) 
+The function to operate all of the above task must run 6 hour before her birthday
+We must use Daemon to help automatically run the program
+Already explained on the above
+
+extra.)
+Main function to call everything 6 hour before Stevanny's Birthday
+```
+void Main_Function(pid_t child_id, char *stevany_directory_name[]) {
+
+	int status;
+	
+	char *directory_name[] = {"Film", "Musik", "Foto"};
+
+	function_make_folders(child_id, &status, directory_name, stevany_directory_name);
+
+	function_download_and_unzip(child_id, &status);
+
+	for(int i=0; i<Folder_Count; i++){
+        	function_search_folder_and_move_files(&status, directory_name[i], stevany_directory_name[i]);
+	}
+
+	function_delete_folders(child_id, &status, directory_name);
+
+}
+```
+
+This is the main from the whole program and where the program start
+We just do the basic things for Daemon setup then call the function
+```
 int main() {
 
 	//Fork the Parent Process and turn off the Parent Process
@@ -277,22 +309,19 @@ int main() {
 }
 ```
 
-**Explanation**
-a.)
-
-b.)
-
-c.)
-
-d.)
-
-e.)
-
-f.)
-
+-----
 **Problem Found**
+1.) I'm not used to Linux environment, so it is a bit harsh in the beginning
+2.) It's very hard to code using c languange in nano, so I prefer code it in dev c++ or visual studio or notepad then check it on linux terminal
+3.) To check if the outpot is right or wrong takes too many times (time-consuming)
+4.) Somehow the download can end up working but most often not working
+5.) Daemon sometimes doesn't work, but sometimes works too...weird...
 
+**Documentation**
 
+![Screenshot from 2021-04-09 16-26-49](https://user-images.githubusercontent.com/61174498/115116010-9c9d6f80-9fc1-11eb-9529-41d0ba6690f8.png)
+
+![Screenshot from 2021-04-09 22-27-14](https://user-images.githubusercontent.com/61174498/115116015-a2935080-9fc1-11eb-9372-d0dda1b5a3b0.png)
 
 # Question 2
 
