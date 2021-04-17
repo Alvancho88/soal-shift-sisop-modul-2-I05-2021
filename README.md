@@ -145,4 +145,54 @@ If i run the program, the program only the delete the zip file and the apex_chea
 
 <img width="1301" alt="Screen Shot 2021-04-17 at 20 11 07" src="https://user-images.githubusercontent.com/74056954/115114371-24cb4700-9fb9-11eb-9b1a-cd616dcd2db5.png">
 
+# Question 2
 
+Ranora is an Informatics Engineering student who is currently undergoing an internship at a well-known company called "FakeKos Corp.", a company engaged in data security. Because Ranora is still an apprentice, the workload is not as big as the workload of the company's permanent workers. On Ranora's first day of work, Ranora's apprentice tutor gave her the task of making a program.
+
+**a)Ranora must create a C program which every 40 seconds creates a directory with a name according to the timestamp [YYYY-mm-dd_HH:ii:ss].
+
+**Source Code**
+
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <wait.h>
+#include <syslog.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <stdio.h>
+	
+int main (int argc,char *argv[]){
+int stat;
+char timedate[200];
+struct tm *timenow;
+
+pid_t children_id;
+children_id = fork();
+
+    time_t now = time(NULL);
+    timenow = localtime(&now);
+    strftime(timedate, sizeof(timedate), "%Y-%m-%d_%H:%M:%S", timenow);
+    // Making the format name for directory
+    
+    if (children_id < 0) {
+    exit(EXIT_FAILURE); } // If fails to create a new process , the program will stop
+
+    if (children_id == 0) {
+    // Making directory according to the format name
+    
+    char *argv[] = {"mkdir", timedate, NULL};
+    execv("/bin/mkdir", argv);} 
+
+    else {
+    // this is parent
+    while ((wait(&stat)) > 0);
+    char *argv[] = {"touch", "folderku/fileku.txt", NULL};
+    execv("/usr/bin/touch", argv);
+  }
+}
+
+**Explanation**
+
+So in question number 3a, we are told to create a new directory using exec.c as in Module 2. 
+First, we declare the variables used. After that we create a place to create the date in the format year, month, day, hour, minute, and second. Because we want to match the time we use localtime. We use the strftime function to change the format as specified. This problem isn't really finished yet because it hasn't created a new directory every 40 seconds. But it has succeeded in creating a directory if we run the program.
