@@ -75,15 +75,13 @@ note: we cannot use mkdir() in c, but there is a way to go around it and that is
 We can use them to call for mkdir much like using system but more safely, since system() is risky.
 
 ```
-void function_make_folders(pid_t child_id, int * status, char *directory_name[], char *stevany_directory_name[]) {
+void Function_Make_Folders(pid_t child_id, int * status, char *directory_name[], char *stevany_directory_name[]) {
 
-	//Making a new folder for each file extension by calling fork so that child will execute mkdir command
-	if((child_id = fork()) == 0){
-		char *argv[] = {"mkdir", "-p", stevany_directory_name[0], stevany_directory_name[1], stevany_directory_name[2], NULL};
+	if((child_id = fork()) == 0) {
+		char *argv[] = {"mkdir", "-p", stevany_directory_name[0], stevany_directory_name[1],stevany_directory_name[2], NULL};
 		execv("/bin/mkdir", argv);
 	}
 	while(wait(status) > 0);
-	//-p=no error if existing, make parent directories as needed
 
 }
 ```
@@ -91,101 +89,103 @@ void function_make_folders(pid_t child_id, int * status, char *directory_name[],
 b.) 
 Then we need to use the same method to downloads files in zip from the given links
 We will use fork and execv again this time
-Although this time it's more tricky since I haven't suceed in always be able to download it
 ```
-	//Download Zip Files
-        if((child_id = fork()) > 0){
+void Function_Download(char download_link[], char file_name[]) {
 
-		char *argv[] = {"wget", "--no-check-certificate", 
-		"https://drive.google.com/uc?id=1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD&export=download"
-		, "-O", "Fylm_for_Stevany.zip" , NULL};
+	char *argv[] = {"wget", "--no-check-certificate",
+			download_link,
+			"-O", file_name, "-q", NULL};
+	execv("/bin/wget", argv);
 
-		execv("/bin/wget", argv);
+}
 
+void Function_Download_and_Unzip(pid_t child_id, int * status, char *file_name[]) {
+
+	char *download_links[] = {
+	"https://drive.google.com/uc?id=1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp&export=download",
+        "https://drive.google.com/uc?id=1ZG8nRBRPquhYXq_sISdsVcXx5VdEgi-J&export=download",
+        "https://drive.google.com/uc?id=1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD&export=download"};
+    
+	for(int i=0; i<Folder_Count; i++) {
+        	if((child_id = fork()) == 0){
+			Function_Download(download_links[i], file_name[i]);
+		}
+		while(wait(status) > 0);
+
+		if((child_id = fork()) == 0){
+			Function_Unzip(file_name[i]);
+		}
+		while(wait(status) > 0);
 	}
-	else if ((child_id = fork()) == 0){
 
-		char *argv[] = {"wget", "--no-check-certificate", 
-		"https://drive.google.com/uc?id=1ZG8nRBRPquhYXq_sISdsVcXx5VdEgi-J&export=download"
-		, "-O", "Musyik_for_Stevany.zip" , NULL};
-
-		execv("/bin/wget", argv);
-	}
-	else{
-
-		char *argv[] = {"wget", "--no-check-certificate", 
-		"https://drive.google.com/uc?id=1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp&export=download"
-		, "-O", "Pyoto_for_Stevany.zip" , NULL};
-
-		execv("/bin/wget", argv);
-	}
-	while(wait(status) > 0);
-	//Makes wget to continue despite verification failure, but it still will complain - without that option set wget would simply stop once verification failed.
+}
 ```
 
 c.) 
 We need to extract the files from the zip that has been downloaded
 We can use the same method that is fork and exec for this one on the same function after we download the files
 ```
-	//Unzip into files
-        if((child_id = fork()) > 0){
-		char *argv[] = {"unzip", "Fylm_for_Stevany.zip", NULL};
-		execv("/bin/unzip", argv);
-	}
-	else if((child_id = fork()) == 0){
-		char *argv[] = {"unzip", "Musyik_for_Stevany.zip", NULL};
-		execv("/bin/unzip", argv);
-	}
-	else{
-		char *argv[] = {"unzip", "Pyoto_for_Stevany.zip", NULL};
-		execv("/bin/unzip", argv);
-	}
-	while(wait(status) > 0);
-```
+void Function_Unzip(char file_name[]) {
 
-d.) 
-Now, we need to move the files to the folder that has been made
-First we need to search the folder
+	char *argv[] = {"unzip", "-qq", file_name, NULL};
+	execv("/bin/unzip", argv);
 
-```
-void function_search_folder_and_move_files(int * status, char directory_name[], char stevany_directory_name[]) {
+}
 
-	DIR * directory = opendir(directory_name);
-	struct dirent * directory_entry;
+void Function_Download_and_Unzip(pid_t child_id, int * status, char *file_name[]) {
 
-	if (directory != NULL) {
-		while ((directory_entry = readdir(directory))){
-			function_move_files(directory_entry, status, directory_name, stevany_directory_name);		
+	char *download_links[] = {
+	"https://drive.google.com/uc?id=1ktjGgDkL0nNpY-vT7rT7O6ZI47Ke9xcp&export=download",
+        "https://drive.google.com/uc?id=1ZG8nRBRPquhYXq_sISdsVcXx5VdEgi-J&export=download",
+        "https://drive.google.com/uc?id=1FsrAzb9B5ixooGUs0dGiBr-rC7TS9wTD&export=download"};
+    
+	for(int i=0; i<Folder_Count; i++) {
+        	if((child_id = fork()) == 0){
+			Function_Download(download_links[i], file_name[i]);
 		}
-		(void) closedir (directory);
-	} 
-	else {
-		perror ("Directory access denied");
+		while(wait(status) > 0);
+
+		if((child_id = fork()) == 0){
+			Function_Unzip(file_name[i]);
+		}
+		while(wait(status) > 0);
 	}
 
 }
 ```
 
-Then we move the files using a created function
+d.) 
+Now, we need to move the files to the folder that has been made
+(note: For Pictures, only .jpg files are moved)
+
 ```
-void function_move_files(struct dirent * directory_entry, int * status, char directory_name[], char stevany_directory_name[]) {
-
-	pid_t child_move = fork();
-	if(child_move == 0 && (strcmp(directory_entry->d_name, ".") == 0 || strcmp(directory_entry->d_name, "..") == 0)){
-		exit(EXIT_SUCCESS);
-	}
-
-	if(child_move == 0) {
-        	char path_file[256];
-
-        	strcpy(path_file, directory_name);
-        	strcat(path_file, "/");
-        	strcat(path_file, directory_entry->d_name);
-
-        	char *argv[] = {"mv", path_file, stevany_directory_name, NULL};
-        	execv("/bin/mv", argv);
-	}
-	while(wait(status) > 0);
+int File_Move (){
+    pid_t child_id;
+    int status;
+    child_id = fork();
+    if (child_id < 0){
+        exit(EXIT_FAILURE);
+    }
+    if (child_id == 0){
+        pid_t child_id_2;
+        int status_2;
+        child_id_2 = fork();
+        if (child_id_2 < 0){
+            exit(EXIT_FAILURE);
+        }
+        if (child_id_2 == 0){
+            char *argv[] = {"find", ".", "-name", "*.jpg", "-exec", "mv", "{}", "/home/alvancho/Documents/IO5/Shift_2/Question_1/Pyoto/", ";", NULL};
+            execv("/usr/bin/find", argv);
+        }
+        else{
+            char *argv[] = {"find", ".", "-name", "*.mp3", "-exec", "mv", "{}", "/home/alvancho/Documents/IO5/Shift_2/Question_1/Musyik/", ";", NULL};
+            execv("/usr/bin/find", argv);
+        }
+    }
+    else{
+        char *argv[] = {"find", ".", "-name", "*.mp4", "-exec", "mv", "{}", "/home/alvancho/Documents/IO5/Shift_2/Question_1/Fylm/", ";", NULL};
+        execv("/usr/bin/find", argv);
+    }
 }
 ```
 
@@ -205,28 +205,29 @@ int Birthday_Date_Check(int day, int month) {
 
 Then, we will continue to create the Daemon to run the program automatically
 ```
-void Daemon_Function_Call(int * status) {
+void Daemon_Function (int * status) {
 
 	pid_t child_id;
 	char *stevany_directory_name[] = {"Fylm", "Musyik", "Pyoto"};
-
 	const unsigned sleep_time = 1;
 	const int birthday_hour = 22;
 	const int birthday_minute = 22;
 
 	while (1) {
-
-        	time_t now = time(NULL);
-        	struct tm * nowLocal = localtime(&now);
-
-		//If Birthday_day_month_hour_and_minute is on 09 April Pukul 22.22 WIB, then zip all folders
-		if(Birthday_Date_Check(nowLocal->tm_mday, nowLocal->tm_mon) && birthday_hour == nowLocal->tm_hour && birthday_minute == nowLocal->tm_min && nowLocal->tm_sec == 0){
-			Zip_Birthday_Folders(child_id, status, stevany_directory_name, "Lopyu_Stevany.zip");
-		}
-		//Else if 6 hour before run the Main_Function
-        	else if(Birthday_Date_Check(nowLocal->tm_mday, nowLocal->tm_mon) && birthday_hour - 6 == nowLocal->tm_hour && birthday_minute == nowLocal->tm_min && nowLocal->tm_sec == 0){
-			Main_Function(child_id,stevany_directory_name);
-		}
+	
+        if (time(NULL) == 1617960120){
+            child_id = fork();
+        }
+        if (child_id < 0){
+            exit(EXIT_FAILURE);
+        }
+        if (child_id == 0){
+            Main_Function(child_id,stevany_directory_name);
+        }
+        else if (time(NULL) == 1617981720){
+            while ((wait(&status)) > 0);
+            Birthday_Zip();
+        }
         	while(wait(status) > 0);
 
         sleep(sleep_time);
@@ -235,16 +236,24 @@ void Daemon_Function_Call(int * status) {
 ```
 
 Where if it is the date of her birthday and on the right time, it will execute the function to zip all the folders into one
+And remove the folders
 ```
-void Zip_Birthday_Folders(pid_t child_id, int * status, char *stevany_directory_name[], char zip_name[]) {
-
-	//Zip Folders on Stefany's Birthday
-	if((child_id = fork()) == 0) {
-        	char *argv[] = {"zip", "-rm", zip_name, stevany_directory_name[0], stevany_directory_name[1], stevany_directory_name[2], NULL};
-        	execv("/bin/zip", argv);
-	}
-	while(wait(status) > 0);
-	//m=Move the specified files into the zip archive,r=Travel the directory structure recursively;
+int Birthday_Zip (){
+    pid_t child_id;
+    int status;
+    child_id = fork();
+    if (child_id < 0){
+        exit(EXIT_FAILURE);
+    }
+    if (child_id == 0){
+        char *argv[] = {"zip", "-r", "Lopyu_Stevany", "Fylm/", "Musyik/", "Pyoto/", NULL};
+        execv("/usr/bin/zip", argv);
+    }
+    else{
+        while ((wait(&status)) > 0);
+        char *argv[] = {"rm", "-r", "FILM", "MUSIK", "FOTO", "Fylm", "Musyik", "Pyoto", NULL};
+        execv("/usr/bin/rm", argv);
+    }
 }
 ```
 
@@ -252,25 +261,56 @@ f.)
 The function to operate all of the above task must run 6 hour before her birthday
 We must use Daemon to help automatically run the program
 Already explained on the above
+Daemon Function
+```
+void Daemon_Function (int * status) {
 
-extra.)
+	pid_t child_id;
+	char *stevany_directory_name[] = {"Fylm", "Musyik", "Pyoto"};
+	const unsigned sleep_time = 1;
+	const int birthday_hour = 22;
+	const int birthday_minute = 22;
+
+	while (1) {
+	
+        if (time(NULL) == 1617960120){
+            child_id = fork();
+        }
+        if (child_id < 0){
+            exit(EXIT_FAILURE);
+        }
+        if (child_id == 0){
+            Main_Function(child_id,stevany_directory_name);
+        }
+        else if (time(NULL) == 1617981720){
+            while ((wait(&status)) > 0);
+            Birthday_Zip();
+        }
+        	while(wait(status) > 0);
+
+        sleep(sleep_time);
+	}
+}
+```
+
+Extra.)
 Main function to call everything 6 hour before Stevanny's Birthday
 ```
 void Main_Function(pid_t child_id, char *stevany_directory_name[]) {
 
 	int status;
-	
-	char *directory_name[] = {"Film", "Musik", "Foto"};
+	char *file_name[] = {"FILM.zip", "MUSIK.zip", "FOTO.zip"};
+	char *directory_name[] = {"FILM", "MUSIK", "FOTO"};
 
-	function_make_folders(child_id, &status, directory_name, stevany_directory_name);
+	Function_Make_Folders(child_id, &status, directory_name, stevany_directory_name);
+	Function_Download_and_Unzip(child_id, &status, file_name);
 
-	function_download_and_unzip(child_id, &status);
+	File_Move();
 
-	for(int i=0; i<Folder_Count; i++){
-        	function_search_folder_and_move_files(&status, directory_name[i], stevany_directory_name[i]);
-	}
-
-	function_delete_folders(child_id, &status, directory_name);
+        //char *argv_2[] = {"find", ".", "-name", "*.mp4", "-exec", "mv", "{}", "/home/alvancho/Documents/IO5/Shift_2/Question_1/Fylm/", ";", NULL};
+        //execv("/usr/bin/find", argv_2);
+        //char *argv_3[] = {"find", ".", "-name", "*.mp3", "-exec", "mv", "{}", "/home/alvancho/Documents/IO5/Shift_2/Question_1/Musyik/", ";", NULL};
+        //execv("/usr/bin/find", argv_3);
 
 }
 ```
@@ -280,33 +320,48 @@ We just do the basic things for Daemon setup then call the function
 ```
 int main() {
 
-	//Fork the Parent Process and turn off the Parent Process
+	const char workingDir[] = "/home/alvancho/Documents/IO5/Shift_2/Question_1";
 	pid_t child_id, sid;
 	int status;
-	const char active_directory[] = "/home/alvancho/Documents/IO5/Shift_2/Question_1";
-
+    
 	if((child_id = fork()) > 0){
-		exit(EXIT_SUCCESS);
+        	exit(EXIT_SUCCESS);
 	}
 
-	//Create a Unique Session ID
+	umask(0);
+
 	sid = setsid();
-	if (sid < 0 || chdir(active_directory)){
+	if (sid < 0 || chdir(workingDir)){
 		exit(EXIT_FAILURE);
 	}
 
-	//Changing the File Mode
-	umask(0);
-
-	//Close the Standard File Descriptor
 	close(STDIN_FILENO);
 	close(STDOUT_FILENO);
 	close(STDERR_FILENO);
 
-	//Run the Daemon
-	Daemon_Function_Call(&status);
+	Daemon_Function(&status);
 	return 0;
 }
+```
+
+Header and Declaration
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+#include <syslog.h>
+#include <wait.h>
+#include <time.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#define Folder_Count 3
+
+int File_Move();
+int Birthday_Zip();
 ```
 
 -----
@@ -319,9 +374,36 @@ int main() {
 
 **Documentation**
 
-![Screenshot from 2021-04-09 16-26-49](https://user-images.githubusercontent.com/61174498/115116010-9c9d6f80-9fc1-11eb-9529-41d0ba6690f8.png)
+Initial Condition:
+![Screenshot from 2021-04-09 16-21-41](https://user-images.githubusercontent.com/61174498/115992366-962d7a00-a5f7-11eb-8172-8fc684eef4a3.png)
 
-![Screenshot from 2021-04-09 22-27-14](https://user-images.githubusercontent.com/61174498/115116015-a2935080-9fc1-11eb-9372-d0dda1b5a3b0.png)
+Progress (Making Folder):
+![Screenshot from 2021-04-09 16-22-02](https://user-images.githubusercontent.com/61174498/115992384-ab0a0d80-a5f7-11eb-9a5a-1aed3789d653.png)
+
+Progress ABCD Done:
+![Screenshot from 2021-04-09 16-22-14](https://user-images.githubusercontent.com/61174498/115992397-bbba8380-a5f7-11eb-99c5-1a431e54df33.png)
+
+Birthday Zip Done:
+![Screenshot from 2021-04-09 22-22-03](https://user-images.githubusercontent.com/61174498/115992406-c8d77280-a5f7-11eb-86ca-ba4913db7086.png)
+
+Terminal View:
+![Screenshot from 2021-04-09 22-23-53](https://user-images.githubusercontent.com/61174498/115992411-d260da80-a5f7-11eb-91f0-fcd897084acb.png)
+
+Zip Content:
+![Screenshot from 2021-04-09 16-23-02](https://user-images.githubusercontent.com/61174498/115992419-e3a9e700-a5f7-11eb-832e-d494efc7d66d.png)
+
+![Screenshot from 2021-04-09 16-23-09](https://user-images.githubusercontent.com/61174498/115992423-e73d6e00-a5f7-11eb-9a26-596f7d662626.png)
+
+![Screenshot from 2021-04-09 16-23-17](https://user-images.githubusercontent.com/61174498/115992427-ec022200-a5f7-11eb-9962-32d5c24b54b4.png)
+
+Folders Content:
+![Screenshot from 2021-04-09 16-22-24](https://user-images.githubusercontent.com/61174498/115992438-f9b7a780-a5f7-11eb-8153-9f77c79b894d.png)
+
+![Screenshot from 2021-04-09 16-22-29](https://user-images.githubusercontent.com/61174498/115992445-ff14f200-a5f7-11eb-8ff2-f5f210acd230.png)
+
+![Screenshot from 2021-04-09 16-22-34](https://user-images.githubusercontent.com/61174498/115992449-03410f80-a5f8-11eb-8db4-677c3cda34de.png)
+
+Done
 
 # Question 2
 
