@@ -3,107 +3,93 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <wait.h>
+#include <dirent.h>
+#include <string.h>
 
 int main()
 {
-    pid_t unzip_child_id;
-    int unzip_status;
+    pid_t make_folder_child_id;
+    int make_folder_status;
 
-    unzip_child_id = fork();
+    make_folder_child_id = fork();
 
-    if(unzip_child_id < 0)
+    if(make_folder_child_id < 0)
     {
         exit(EXIT_FAILURE); // if the program failed, then the program will stop
     }
 
-    if(unzip_child_id == 0)
+    if(make_folder_child_id == 0)
     {
-        char *unzip[] = {"unzip", "/home/rafihayla/modul2/petshop/pets.zip", NULL};
-        execv("/bin/unzip", unzip);
+        char *mkdir[] = {"mkdir", "-p", "/home/rafihayla/modul2/petshop", NULL};
+        execv("/bin/unzip", mkdir);
     }
-
+    
     else
     {
-        while((wait(&unzip_status)) > 0);
-        pid_t child_id;
-        int status;
+        while((wait(&make_folder_status)) > 0);
+        pid_t unzip_child_id;
+        int unzip_status;
 
-        child_id = fork();
+        unzip_child_id = fork();
 
-        if(child_id < 0)
+        if(unzip_child_id < 0)
         {
             exit(EXIT_FAILURE); // if the program failed, then the program will stop
         }
 
-        if(child_id == 0)
+        if(unzip_child_id == 0)
         {
-            char *deletezip[] = {"rm", "/home/rafihayla/modul2/petshop/pets.zip", NULL};
-            execv("/bin/rm", deletezip);
+            char *unzip[] = {"unzip", "/home/rafihayla/Downloads/pets.zip", "-d", "/home/rafihayla/modul2/petshop", NULL};
+            execv("/bin/unzip", unzip);
         }
-        
+
         else
         {
-            while((wait(&status)) > 0);
-            pid_t child2_id;
-            int status2;
+            while((wait(&unzip_status)) > 0);
+            pid_t delete_unnecessary_directory_child_id;
+            int delete_unnecessary_folders_status;
 
-            child2_id = fork();
+            delete_unnecessary_directory_child_id = fork();
 
-            if(child2_id < 0)
+            if(delete_unnecessary_directory_child_id < 0)
             {
                 exit(EXIT_FAILURE); // if the program failed, then the program will stop
             }
 
-            if(child2_id == 0)
+            if(delete_unnecessary_directory_child_id == 0)
             {
-                char *deletedirectory1[] = {"rm", "-r", "/home/rafihayla/modul2/petshop/apex_cheats", NULL};
-                execv("/bin/rm", deletedirectory1);
-            }
+                DIR *dir;
+                struct dirent *input;
+                dir = opendir("/home/rafihayla/modul2/petshop");
 
-            else
-            {
-                while((wait(&status2)) > 0);
-                pid_t child3_id;
-                int status3;
-
-                child3_id = fork();
-
-                if(child3_id < 0)
+                while((input = readdir(dir)) != NULL)
                 {
-                    exit(EXIT_FAILURE); // if the program failed, then the program will stop
-                }
-
-                if(child3_id == 0)
-                {
-                    char *deletedirectory2[] = {"rm", "-r", "/home/rafihayla/modul2/petshop/musics", NULL};
-                    execv("/bin/rm", deletedirectory2);
-                }
-
-                else
-                {
-                    while((wait(&status3)) > 0);
-                    pid_t child4_id;
-                    int status4;
-
-                    child4_id = fork();
-
-                    if(child4_id < 0)
+                    if(strcmp(input -> d_name, ".")  && strcmp(input -> d_name, "..") )
                     {
-                        exit(EXIT_FAILURE); // if the program failed, then the program will stop
-                    }
+                        if(input -> d_type == DT_DIR)
+                        {
+                            pid_t delete_unnecessary_child_id;
+                            int delete_unnecessary_status;
 
-                    if(child4_id == 0)
-                    {
-                        char *deletedirectory3[] = {"rm", "-r", "/home/rafihayla/modul2/petshop/unimportant_files", NULL};
-                         execv("/bin/rm", deletedirectory3);
+                            delete_unnecessary_child_id = fork();
+
+                            if(delete_unnecessary_child_id < 0)
+                            {
+                                exit(EXIT_FAILURE); // if the program failed, then the program will stop
+                            }
+
+                            if(delete_unnecessary_child_id == 0)
+                            {
+                                char unnecessary[50];
+                                sprintf(unnecessary, "/home/rafihayla/modul2/petshop/%s", input -> d_name);
+                                char *delete[] = {"rm", "-r", unnecessary, NULL};
+                                execv("/bin/rm", delete);
+                            }
+                        }
+
                     }
                 }
             }
-        
         }
-        
-        
     }
-
-    
-}
+} 
