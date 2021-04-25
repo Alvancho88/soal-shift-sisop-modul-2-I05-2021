@@ -331,110 +331,102 @@ Loba works in a famous pet shop, one day he got a zip containing lots of pets ph
 
 **Source Code**
 
-```#include <stdio.h>
+```
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <wait.h>
+#include <dirent.h>
+#include <string.h>
 
 int main()
 {
-    pid_t unzip_child_id;
-    int unzip_status;
+    pid_t make_folder_child_id;
+    int make_folder_status;
 
-    unzip_child_id = fork();
+    make_folder_child_id = fork();
 
-    if(unzip_child_id < 0)
+    if(make_folder_child_id < 0)
     {
         exit(EXIT_FAILURE); // if the program failed, then the program will stop
     }
 
-    if(unzip_child_id == 0)
+    if(make_folder_child_id == 0)
     {
-        char *unzip[] = {"unzip", "/home/rafihayla/modul2/petshop/pets.zip", NULL};
-        execv("/bin/unzip", unzip);
+        char *mkdir[] = {"mkdir", "-p", "/home/rafihayla/modul2/petshop", NULL};
+        execv("/bin/unzip", mkdir);
     }
-
+    
     else
     {
-        while((wait(&unzip_status)) > 0);
-        pid_t child_id;
-        int status;
+        while((wait(&make_folder_status)) > 0);
+        pid_t unzip_child_id;
+        int unzip_status;
 
-        child_id = fork();
+        unzip_child_id = fork();
 
-        if(child_id < 0)
+        if(unzip_child_id < 0)
         {
             exit(EXIT_FAILURE); // if the program failed, then the program will stop
         }
 
-        if(child_id == 0)
+        if(unzip_child_id == 0)
         {
-            char *deletezip[] = {"rm", "/home/rafihayla/modul2/petshop/pets.zip", NULL};
-            execv("/bin/rm", deletezip);
+            char *unzip[] = {"unzip", "/home/rafihayla/Downloads/pets.zip", "-d", "/home/rafihayla/modul2/petshop", NULL};
+            execv("/bin/unzip", unzip);
         }
-        
+
         else
         {
-            while((wait(&status)) > 0);
-            pid_t child2_id;
-            int status2;
+            while((wait(&unzip_status)) > 0);
+            pid_t delete_unnecessary_directory_child_id;
+            int delete_unnecessary_folders_status;
 
-            child2_id = fork();
+            delete_unnecessary_directory_child_id = fork();
 
-            if(child2_id < 0)
+            if(delete_unnecessary_directory_child_id < 0)
             {
                 exit(EXIT_FAILURE); // if the program failed, then the program will stop
             }
 
-            if(child2_id == 0)
+            if(delete_unnecessary_directory_child_id == 0)
             {
-                char *deletedirectory1[] = {"rm", "-r", "/home/rafihayla/modul2/petshop/apex_cheats", NULL};
-                execv("/bin/rm", deletedirectory1);
-            }
+                DIR *dir;
+                struct dirent *input;
+                dir = opendir("/home/rafihayla/modul2/petshop");
 
-            else
-            {
-                while((wait(&status2)) > 0);
-                pid_t child3_id;
-                int status3;
-
-                child3_id = fork();
-
-                if(child3_id < 0)
+                while((input = readdir(dir)) != NULL)
                 {
-                    exit(EXIT_FAILURE); // if the program failed, then the program will stop
-                }
-
-                if(child3_id == 0)
-                {
-                    char *deletedirectory2[] = {"rm", "-r", "/home/rafihayla/modul2/petshop/musics", NULL};
-                    execv("/bin/rm", deletedirectory2);
-                }
-
-                else
-                {
-                    while((wait(&status3)) > 0);
-                    pid_t child4_id;
-                    int status4;
-
-                    child4_id = fork();
-
-                    if(child4_id < 0)
+                    if(strcmp(input -> d_name, ".")  && strcmp(input -> d_name, "..") )
                     {
-                        exit(EXIT_FAILURE); // if the program failed, then the program will stop
-                    }
+                        if(input -> d_type == DT_DIR)
+                        {
+                            pid_t delete_unnecessary_child_id;
+                            int delete_unnecessary_status;
 
-                    if(child4_id == 0)
-                    {
-                        char *deletedirectory3[] = {"rm", "-r", "/home/rafihayla/modul2/petshop/unimportant_files", NULL};
-                         execv("/bin/rm", deletedirectory3);
+                            delete_unnecessary_child_id = fork();
+
+                            if(delete_unnecessary_child_id < 0)
+                            {
+                                exit(EXIT_FAILURE); // if the program failed, then the program will stop
+                            }
+
+                            if(delete_unnecessary_child_id == 0)
+                            {
+                                char unnecessary[50];
+                                sprintf(unnecessary, "/home/rafihayla/modul2/petshop/%s", input -> d_name);
+                                char *delete[] = {"rm", "-r", unnecessary, NULL};
+                                execv("/bin/rm", delete);
+                            }
+                        }
+
                     }
                 }
             }
-        }         
+        }
     }
-}
+} 
 ```
 
 **Explanation**
@@ -453,13 +445,7 @@ If i run the program, the program only the delete the zip file and the apex_chea
 
 **Documentation**
 
-<img width="467" alt="Screen Shot 2021-04-17 at 20 01 34" src="https://user-images.githubusercontent.com/74056954/115114161-fa2cbe80-9fb7-11eb-9ff4-322021dd6bd2.png">
-
-<img width="513" alt="Screen Shot 2021-04-17 at 20 02 10" src="https://user-images.githubusercontent.com/74056954/115114175-0749ad80-9fb8-11eb-8b30-c19f570b99f7.png">
-
-<img width="510" alt="Screen Shot 2021-04-17 at 20 02 50" src="https://user-images.githubusercontent.com/74056954/115114180-0f095200-9fb8-11eb-9c29-7db4f3ddb2ac.png">
-
-<img width="1301" alt="Screen Shot 2021-04-17 at 20 11 07" src="https://user-images.githubusercontent.com/74056954/115114371-24cb4700-9fb9-11eb-9b1a-cd616dcd2db5.png">
+<img width="1168" alt="Screen Shot 2021-04-25 at 14 59 32" src="https://user-images.githubusercontent.com/74056954/115985668-20b1b180-a5d7-11eb-95e2-a8998a157273.png">
 
 **b)  Pet photos need to be categorized based on the pet's species, so you will need to create a folder for each species that is in the zip file. Since you can't possibly check manually, the program needs to create the required folders according to the contents of the zip file.
 Example: Cats will be stored in ```"/petshop/cat"```, turtles will be stored in ```"/petshop/turtle"```.**
