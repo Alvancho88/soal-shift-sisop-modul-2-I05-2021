@@ -435,13 +435,7 @@ Based on my understanding, before we start the program. We must download the zip
 
 **Problem Found**
 
-I don't know why if i only make 1 child process and 1 parent process:
-
-  child process: extracting the zip file
-  
-  parent process: removing all the unnecessary file and folders
-  
-If i run the program, the program only the delete the zip file and the apex_cheats folder. It won't delete the remaining unneccessary file (musics and unimportant_files).
+For me, there are some syntax that i never knew before. It was very new for me. So, sometimes it was really confusing and frustating.
 
 **Documentation**
 
