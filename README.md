@@ -606,6 +606,8 @@ First, we must first create the main function that uses the daemon so that when 
 
 Then after that we call the fork function and after it is broken down we run mkdir to create the directory as specified. So that other processes don't take a lot of time (40 seconds), we break the process and its parent again with return.
 
+![image](https://user-images.githubusercontent.com/61174498/115994547-a9454780-a601-11eb-9fbf-8fd6a8b3d364.png)
+
 **b)Each directory is filled with 10 images downloaded from https://picsum.photos/, where each image will be downloaded every 5 seconds. Each downloaded image will be named with a timestamp format [YYYY-mm-dd_HH:ii:ss] and the image is square with the size (n% 1000) + 50 pixels where n is the Unix Epoch time.
 
 **Source Code**
@@ -658,6 +660,8 @@ int Download(char timedate[]){
 First of all, we have to split the child process from Problem 3a into two function processes. Then follow by using sleep (5) to download an image every 5 seconds.
 First of all, we have to split the child process from Problem 3a into two function processes. Then follow by using sleep (5) to download an image every 5 seconds. After downloading the image every 5 seconds, we format the name according to the current time. After that, we create a path that contains the destination folder and the name of the image that was downloaded earlier. Then, we calculate the size for the obtained image. Don't forget to add the image size to the url to download the image. The final step, we just need to download the image according to the url and path that was created earlier.
 
+![image](https://user-images.githubusercontent.com/61174498/115994581-db56a980-a601-11eb-8ad2-b0226ec578a5.png)
+
 **c)After the directory has been filled with 10 images, the program will create a file "status.txt", which contains the message "Download Success" which is encrypted with the Caesar Cipher technique and with shift 5. Caesar Cipher is a simple encryption technique which can perform encryption. string according to the shift / key that we specify. For example, the letter "A" will be encrypted with shift 4 it will become "E". Because Ranora is a perfectionist and neat person, he wants after the file is created, the directory will be zipped and the directory will be deleted, leaving only the zip file.
 
 **Source Code**
@@ -702,6 +706,10 @@ void MakeZIP(char timedate[]){
 ```
 **Explanation**
 The first thing to do is to continue the program from Problem 3b which comes from the MakeDirectory function. In the Cipher () function, each letter in the message is shifted as many as keys. Then in the MakeTXT function we create a path containing the folder name and the file name status.txt. Then we create a file with an encrypted path into that file. Furthermore, in the MakeZIP function, the directory containing 10 images will be zipped. After that delete the zipped directory file with the arguments.
+
+![image](https://user-images.githubusercontent.com/61174498/115994602-ec071f80-a601-11eb-8804-edfbc019e506.png)
+
+![image](https://user-images.githubusercontent.com/61174498/115994613-f2959700-a601-11eb-8893-57b665be20f7.png)
 
 **d&e)To make it easier to control the program, the Ranora apprentice supervisor wants the program to produce an executable "Killer" program, where the program will terminate all running program processes and will run itself after the program is run. Because Ranora is interested in something new, Ranora has an idea for the "Killer" program that was made, it must be a bash program.The Ranora apprentice supervisor also wants the main program created by Ranora to run in two modes. To activate the first mode, the program must be executed with the -z argument, and when it is executed in the first mode, the main program will immediately execute all its operations when the Killer program is run. Meanwhile, to activate the second mode, the program must be run with the -x argument, and when run in the second mode, the main program will stop allowing the processes in each directory that are still running until it is finished (The directory that has been created will download the image to completion and create a txt file, then zip and delete the directory).
 
@@ -754,4 +762,8 @@ int main(int argN, char **argV) {
 ```
 **Explanation**
 The first thing to do is to call the MakeKiller () function on the main function. The MakeKiller function will break the process in two. The -x process will catch the program in real time. The -z process will click the program after the image in the last directory has finished downloading. After that we use MakeKiller to change the killer file to make it executable.
+
+![image](https://user-images.githubusercontent.com/61174498/115994620-fc1eff00-a601-11eb-85e2-1f96611f6d30.png)
+
+![image](https://user-images.githubusercontent.com/61174498/115994628-03460d00-a602-11eb-886d-a9635a77e1ca.png)
 
