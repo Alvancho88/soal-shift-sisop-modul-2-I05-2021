@@ -531,47 +531,227 @@ Ranora is an Informatics Engineering student who is currently undergoing an inte
 **a)Ranora must create a C program which every 40 seconds creates a directory with a name according to the timestamp [YYYY-mm-dd_HH:ii:ss].
 
 **Source Code**
+```
+int main(int argN, char **argV) {
+	pid_t pid, sid;       
+	pid = fork(); 
+	    
+  	if (pid < 0) {
+    		exit(EXIT_FAILURE);}
 
-#include <stdlib.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <wait.h>
-#include <syslog.h>
-#include <sys/stat.h>
-#include <time.h>
-#include <stdio.h>
-	
-int main (int argc,char *argv[]){
-int stat;
-char timedate[200];
-struct tm *timenow;
+  	if (pid > 0) {
+  	  	exit(EXIT_SUCCESS);}
+		umask(0);
 
-pid_t children_id;
-children_id = fork();
-
-    time_t now = time(NULL);
-    timenow = localtime(&now);
-    strftime(timedate, sizeof(timedate), "%Y-%m-%d_%H:%M:%S", timenow);
-    // Making the format name for directory
-    
-    if (children_id < 0) {
-    exit(EXIT_FAILURE); } // If fails to create a new process , the program will stop
-
-    if (children_id == 0) {
-    // Making directory according to the format name
-    
-    char *argv[] = {"mkdir", timedate, NULL};
-    execv("/bin/mkdir", argv);} 
-
-    else {
-    // this is parent
-    while ((wait(&stat)) > 0);
-    char *argv[] = {"touch", "folderku/fileku.txt", NULL};
-    execv("/usr/bin/touch", argv);
-  }
-}
+  	sid = setsid();
+  	if (sid < 0) {
+  	 	exit(EXIT_FAILURE);}
+  	close(STDIN_FILENO);
+  	close(STDOUT_FILENO);
+  	close(STDERR_FILENO);
+  	MakeKiller(argN, argV, (int) getpid()+1);
+	while(1){
+		int a = MakeDirectory();
+		if (a == 10){	
+			sleep(40);}}}
+```
+```
+int MakeDirectory(){
+	char timedate[150];
+	int status;
+	time_t t;
+	pid_t child_id;
+	child_id = fork();
+	t = time(NULL);
+  	
+	strftime(timedate, sizeof(timedate), "%Y-%m-%d_%H:%M:%S", localtime(&t));
+	if(child_id < 0)
+		exit(EXIT_FAILURE);
+	if (child_id == 0){	
+  		
+		char *argv[] = {"mkdir", timedate, NULL};
+		execv("/bin/mkdir", argv);}
+	else if(child_id > 0 && wait(&status) > 0){
+		pid_t child_id2;
+		child_id2 = fork();
+		if(child_id2 < 0)
+			exit(EXIT_FAILURE);
+		if (child_id2 == 0){
+			pid_t child_id3;
+			child_id3 = fork();
+		if(child_id3 < 0)
+				exit(EXIT_FAILURE);
+		if (child_id3 == 0){	
+				
+  				short gambar = 1;
+				while(gambar <= 10){
+					int z = Download(timedate);
+					if(z == 7){
+						gambar++;
+						sleep(5);}}}
+			else if(child_id3 > 0 && wait(&status) > 0){
+				char message[20] = {"Download Success"};
+				int key = 5;
+				Cipher(message, key);
+				MakeTXT(message, timedate);
+				MakeZIP(timedate);}
+			kill(getpid(),SIGTERM);}
+		else{
+			return 10;}}}
+			
+```
 
 **Explanation**
+First, we must first create the main function that uses the daemon so that when the program is run it can perform other commands. To keep the program running, we can use while (1) to create a directory for 40 seconds by calling the MakeDirectory function followed by sleep (40).
 
-So in question number 3a, we are told to create a new directory using exec.c as in Module 2. 
-First, we declare the variables used. After that we create a place to create the date in the format year, month, day, hour, minute, and second. Because we want to match the time we use localtime. We use the strftime function to change the format as specified. This problem isn't really finished yet because it hasn't created a new directory every 40 seconds. But it has succeeded in creating a directory if we run the program.
+Then after that we call the fork function and after it is broken down we run mkdir to create the directory as specified. So that other processes don't take a lot of time (40 seconds), we break the process and its parent again with return.
+
+**b)Each directory is filled with 10 images downloaded from https://picsum.photos/, where each image will be downloaded every 5 seconds. Each downloaded image will be named with a timestamp format [YYYY-mm-dd_HH:ii:ss] and the image is square with the size (n% 1000) + 50 pixels where n is the Unix Epoch time.
+
+**Source Code**
+```
+if (child_id2 == 0){
+			pid_t child_id3;
+			child_id3 = fork();
+		if(child_id3 < 0)
+				exit(EXIT_FAILURE);
+		if (child_id3 == 0){	
+				
+  				short gambar = 1;
+				while(gambar <= 10){
+					int z = Download(timedate);
+					if(z == 7){
+						gambar++;
+						sleep(5);}}}
+```
+```
+int Download(char timedate[]){
+	
+	char temp[150];
+  	char path[150]={};
+  	char url[150]={};
+	pid_t child_id;
+	child_id = fork();
+	time_t t;
+	t = time(NULL);
+	
+	strftime(temp, sizeof(temp), "%Y-%m-%d_%H:%M:%S", localtime(&t));
+	
+  	strcat(path, timedate);
+  	strcat(path,"/");
+  	strcat(path, temp);
+  	
+  	int SIZE = (((int)t)%1000)+50;
+  	
+  	sprintf(url, "https://picsum.photos/%d/%d", SIZE, SIZE); 
+	if(child_id < 0)
+		exit(EXIT_FAILURE);
+	if (child_id == 0){
+		
+		char *argv[] = {"wget",url , "-qO", path, NULL};
+  		execv("/bin/wget", argv);
+  		kill(getpid(),SIGTERM);}
+	else{
+		return 7;}}
+```
+**Explanation**
+First of all, we have to split the child process from Problem 3a into two function processes. Then follow by using sleep (5) to download an image every 5 seconds.
+First of all, we have to split the child process from Problem 3a into two function processes. Then follow by using sleep (5) to download an image every 5 seconds. After downloading the image every 5 seconds, we format the name according to the current time. After that, we create a path that contains the destination folder and the name of the image that was downloaded earlier. Then, we calculate the size for the obtained image. Don't forget to add the image size to the url to download the image. The final step, we just need to download the image according to the url and path that was created earlier.
+
+**c)After the directory has been filled with 10 images, the program will create a file "status.txt", which contains the message "Download Success" which is encrypted with the Caesar Cipher technique and with shift 5. Caesar Cipher is a simple encryption technique which can perform encryption. string according to the shift / key that we specify. For example, the letter "A" will be encrypted with shift 4 it will become "E". Because Ranora is a perfectionist and neat person, he wants after the file is created, the directory will be zipped and the directory will be deleted, leaving only the zip file.
+
+**Source Code**
+```
+void Cipher(char message[], int key){
+	
+	char ch;
+	int i;
+	for(i = 0; message[i] != '\0'; ++i){
+		ch = message[i];
+ 
+		if(ch >= 'a' && ch <= 'z'){
+			ch = ch + key;
+ 			
+			if(ch > 'z'){
+				ch = ch - 'z' + 'a' - 1;}
+			message[i] = ch;}
+		else if(ch >= 'A' && ch <= 'Z'){
+			ch = ch + key;
+ 			
+			if(ch > 'Z'){
+				ch = ch - 'Z' + 'A' - 1;}
+			message[i] = ch;}}}
+
+void MakeTXT(char message[], char timedate[]){
+	
+	FILE *file1;
+	char path [150] = {}; 
+	
+	strcat(path, timedate);
+  	strcat(path,"/");
+  	strcat(path, "status.txt");
+  	file1 = fopen(path, "w");
+  	
+  	fputs(message, file1);
+  	fclose(file1);}
+
+void MakeZIP(char timedate[]){
+	
+	char *argv[] = {"zip", "-r" , "-m", timedate, timedate, NULL};
+  	execv("/bin/zip", argv);}
+```
+**Explanation**
+The first thing to do is to continue the program from Problem 3b which comes from the MakeDirectory function. In the Cipher () function, each letter in the message is shifted as many as keys. Then in the MakeTXT function we create a path containing the folder name and the file name status.txt. Then we create a file with an encrypted path into that file. Furthermore, in the MakeZIP function, the directory containing 10 images will be zipped. After that delete the zipped directory file with the arguments.
+
+**d&e)To make it easier to control the program, the Ranora apprentice supervisor wants the program to produce an executable "Killer" program, where the program will terminate all running program processes and will run itself after the program is run. Because Ranora is interested in something new, Ranora has an idea for the "Killer" program that was made, it must be a bash program.The Ranora apprentice supervisor also wants the main program created by Ranora to run in two modes. To activate the first mode, the program must be executed with the -z argument, and when it is executed in the first mode, the main program will immediately execute all its operations when the Killer program is run. Meanwhile, to activate the second mode, the program must be run with the -x argument, and when run in the second mode, the main program will stop allowing the processes in each directory that are still running until it is finished (The directory that has been created will download the image to completion and create a txt file, then zip and delete the directory).
+
+**Source Code**
+```
+void MakeKiller(int argN, char **argV, int pid){
+	
+	pid_t child_id;
+	child_id = fork();
+	int status;
+	if(child_id < 0)
+		exit(EXIT_FAILURE);
+	if (child_id == 0){
+		//3e	
+		FILE *file1 = fopen("killer.sh", "w");
+		if (argN == 2 && strcmp(argV[1], "-z") == 0){
+			
+			fprintf(file1, "#!/bin/bash\nkillall -9 ranoracok\nrm \"$0\"");}
+		else if (argN == 2 && strcmp(argV[1], "-x") == 0){
+			
+			fprintf(file1, "#!/bin/bash\nkill %d\nrm \"$0\"", pid);}
+		fclose(file1);}
+	else if(child_id > 0 && wait(&status) > 0){
+	
+		char *argv[] = {"chmod", "+x", "killer.sh", NULL};
+        	execv("/bin/chmod", argv);}}
+
+int main(int argN, char **argV) {
+	pid_t pid, sid;       
+	pid = fork(); 
+	    
+  	if (pid < 0) {
+    		exit(EXIT_FAILURE);}
+
+  	if (pid > 0) {
+  	  	exit(EXIT_SUCCESS);}
+		umask(0);
+
+  	sid = setsid();
+  	if (sid < 0) {
+  	 	exit(EXIT_FAILURE);}
+  	close(STDIN_FILENO);
+  	close(STDOUT_FILENO);
+  	close(STDERR_FILENO);
+  	MakeKiller(argN, argV, (int) getpid()+1);
+	while(1){
+		int a = MakeDirectory();
+		if (a == 10){	
+			sleep(40);}}}
+```
+**Explanation**
+The first thing to do is to call the MakeKiller () function on the main function. The MakeKiller function will break the process in two. The -x process will catch the program in real time. The -z process will click the program after the image in the last directory has finished downloading. After that we use MakeKiller to change the killer file to make it executable.
+
