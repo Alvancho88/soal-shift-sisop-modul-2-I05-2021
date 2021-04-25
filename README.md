@@ -461,6 +461,90 @@ If i run the program, the program only the delete the zip file and the apex_chea
 
 <img width="1301" alt="Screen Shot 2021-04-17 at 20 11 07" src="https://user-images.githubusercontent.com/74056954/115114371-24cb4700-9fb9-11eb-9b1a-cd616dcd2db5.png">
 
+**b) Pet photos need to be categorized based on the pet's species, so you will need to create a folder for each species that is in the zip file. Since you can't possibly check manually, the program needs to create the required folders according to the contents of the zip file.
+Example: Cats will be stored in ```"/petshop/cat"```, turtles will be stored in ```"/petshop/turtle"```.**
+
+**Source Code**
+```
+```
+
+**Explanation**
+```
+```
+
+**Problem Found**
+```
+```
+
+**Documentation**
+```
+```
+
+**c) After the folders are created, your program should move the photos to the folder based on their respective species and rename the photo with the pet's name.
+Example: ```"/petshop/cat/joni.jpg"```**
+
+**Source Code**
+```
+```
+
+**Explanation**
+```
+```
+
+**Problem Found**
+```
+```
+
+**Documentation**
+```
+```
+
+**d)Because 1 photo may have more than 1 pet in it, photos must be moved to each corresponding category.
+Example: photo with the name ```"dog;baro;1_cat;joni;2.jpg"``` is moved to the folder ```"/petshop/cat/joni.jpg"``` and ```"/petshop/dog/baro.jpg"```**
+
+**Source Code**
+```
+```
+
+**Explanation**
+```
+```
+
+**Problem Found**
+```
+```
+
+**Documentation**
+```
+```
+
+**e)In each folder, create a file ```"keterangan.txt"``` that contains names and ages of all the pets in the folder.**
+
+**Source Code**
+```
+```
+
+**Explanation**
+```
+```
+
+**Problem Found**
+```
+```
+
+**Documentation**
+```
+```
+
+**NOTE**
+``` 
+- Every pet is saved with the format [pet species]:[pet name]:[pet age in years]. 
+  If there exists more than 1 pet, the data is separated with an underscore(_).
+- You are not allowed to use system(), mkdir(), dan rename() C functions.
+- Use fork dan exec.
+```
+
+
 # Question 3
 
 Ranora is an Informatics Engineering student who is currently undergoing an internship at a well-known company called "FakeKos Corp.", a company engaged in data security. Because Ranora is still an apprentice, the workload is not as big as the workload of the company's permanent workers. On Ranora's first day of work, Ranora's apprentice tutor gave her the task of making a program.
