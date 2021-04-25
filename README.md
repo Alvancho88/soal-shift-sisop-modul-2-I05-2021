@@ -461,7 +461,7 @@ If i run the program, the program only the delete the zip file and the apex_chea
 
 <img width="1301" alt="Screen Shot 2021-04-17 at 20 11 07" src="https://user-images.githubusercontent.com/74056954/115114371-24cb4700-9fb9-11eb-9b1a-cd616dcd2db5.png">
 
-**b) Pet photos need to be categorized based on the pet's species, so you will need to create a folder for each species that is in the zip file. Since you can't possibly check manually, the program needs to create the required folders according to the contents of the zip file.
+**b)  Pet photos need to be categorized based on the pet's species, so you will need to create a folder for each species that is in the zip file. Since you can't possibly check manually, the program needs to create the required folders according to the contents of the zip file.
 Example: Cats will be stored in ```"/petshop/cat"```, turtles will be stored in ```"/petshop/turtle"```.**
 
 **Source Code**
@@ -499,7 +499,7 @@ Example: ```"/petshop/cat/joni.jpg"```**
 ```
 ```
 
-**d)Because 1 photo may have more than 1 pet in it, photos must be moved to each corresponding category.
+**d)  Because 1 photo may have more than 1 pet in it, photos must be moved to each corresponding category.
 Example: photo with the name ```"dog;baro;1_cat;joni;2.jpg"``` is moved to the folder ```"/petshop/cat/joni.jpg"``` and ```"/petshop/dog/baro.jpg"```**
 
 **Source Code**
@@ -518,7 +518,7 @@ Example: photo with the name ```"dog;baro;1_cat;joni;2.jpg"``` is moved to the f
 ```
 ```
 
-**e)In each folder, create a file ```"keterangan.txt"``` that contains names and ages of all the pets in the folder.**
+**e)  In each folder, create a file ```"keterangan.txt"``` that contains names and ages of all the pets in the folder.**
 
 **Source Code**
 ```
